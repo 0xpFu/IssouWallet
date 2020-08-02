@@ -24,7 +24,7 @@ if(isset($_POST['action']) && $_POST['action'] != "") {
                 } else { 
                     $query=$db->prepare("INSERT into users (username, password, wallet_address) VALUES (:username, :password, :wallet_address)");
                     $query->bindValue(':username',$username, PDO::PARAM_STR);
-                    $query->bindValue(':password',md5(sha1($password)), PDO::PARAM_STR);
+                    $query->bindValue(':password',password_hash($password, PASSWORD_ARGON2I), PDO::PARAM_STR);
                     $query->bindValue(':wallet_address',$address, PDO::PARAM_STR);
                     $query->execute();
                     header('Location: /blockchain/wallet/sign_in.php');
@@ -50,7 +50,7 @@ if(isset($_POST['action']) && $_POST['action'] != "") {
                 $query->execute();
                 $data=$query->fetch();
                 
-                if ($data['username'] === $_POST['username'] && $data['password'] === md5(sha1($_POST['password']))) {
+                if ($data['username'] === $_POST['username'] && $data['password'] === password_hash($password, PASSWORD_ARGON2I)) {
                     
                     $sold = shell_exec('C:\Python36\python.exe ../count_the_money.py ' . $data['wallet_address']);
                     
